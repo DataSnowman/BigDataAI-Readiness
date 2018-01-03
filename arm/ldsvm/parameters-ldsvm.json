@@ -6,6 +6,6 @@
      "adminPassword": { "value" : "BigDataAI2018!" },
      "numberOfInstances": {"value" : 1},
      "vmName": { "value" : "bdaireadyldsvm" },
-     "vmSize": { "value" : "Standard_D4s_v3" }
+     "vmSize": { "value" : "Standard_DS4_v2" }
   }
 }
