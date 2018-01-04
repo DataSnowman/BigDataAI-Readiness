@@ -51,7 +51,6 @@
     },
     "variables": {
         "namePrefix": "[resourceGroup().name]",
-        "uniqueNamePrefix": "[toLower(concat(resourceGroup().name, uniqueString(subscription().subscriptionId)))]",
         "uniqueNameSuffix": "[toLower(uniqueString(resourceGroup().id, subscription().subscriptionId))]",
         "location": "[resourceGroup().location]",
         "storageVersion": "2015-06-15",

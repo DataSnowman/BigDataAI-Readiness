@@ -89,7 +89,8 @@ For the remainder of this tutorial, you will be working exclusively on the DSVM.
 1. Launch the Azure Machine Learning Workbench. When prompted to authenticate using an Azure account, please do so.
 2. Click on initials at the bottom-left corner of the Workbench and make sure that we are using the correct account (namely the Experimentation account and matching Model Management account we created in section 2.1.4).
 3. Go to **File > Configure Project IDE** and name the IDE `Code` with the following path `C:\Program Files\Microsoft VS Code\Code.exe`. Click OK to configure IDE.  This will allow us to open the entire project in Visual Studio Code, which is our editor of choice for this Tutorial.
-4. Go to **File > New Project** to creat a new project.  Enter a Project name like `FirstProject`, and Project directory like `C:\Users\aiuser\Documents\workbench`, and search Project Templates for `MMLSpark` to bring bring up the `MMLSpark on Adult Census` template. Select the template and click on Create.
+4. Go to **File > New Project** to creat a new project.  Enter a Project name like `FirstProject`, and Project directory like `C:\workbench`, and search Project Templates for `MMLSpark` to bring bring up the `MMLSpark on Adult Census` template. Select the template and click on Create.
+**Note:** that you should create the projects closer to file system root, for example C:/AzureML to avoid issues like in **Get the model file(s)** in Part 5 below.
 5. Go to **File > Open Project (VSCode)** to open the project in Visual Studio Code. It is not necessary to use Code to make edit our course files but it is much more convenient. We will return to Code when we need to make changes to the existing scripts.
 6. We now log into the Azure CLI using our Azure account. Return to the Workbench and go to **File > Open Command Prompt**. Check that the Azure CLI is installed on the DSVM by typing `az -h`. Now type `az login` and copy the access code. In Firefox open a **private tab** using **CTRL+SHIFT+P** then enter the URL `aka.ms/devicelogin` and when prompted, paste in the access code. Next, authenticate using an Azure account.
 7. We now set the Azure CLI to use the right Azure account. From the command prompt, enter `az account list –o table` to see available accounts. Then copy the subscription ID from the Azure account used to create an AML Workbench account and type `az account set –s <subscription_id>`, replacing `<subscription_id>` with the account ID. You can enter `az account show` to see if the account is set correctly.
@@ -106,6 +107,8 @@ Note you may have already done this above in section 2.2.4.  If not create a new
 3.	In the **Create New Project** pane, fill in the information for your new project.
 4.	In the **Search Project Templates** search box, type **`MMLSpark on Adult Census`**, and select the template.
 5.	Select **Create**.
+
+**Note:** that you should create the projects closer to file system root, for example C:/AzureML to avoid issues like in **Get the model file(s)** in Part 5 below.
 
 Have a look at the folders, code, and configuration files.
 
@@ -140,7 +143,7 @@ The Azure CLI is a command line utility for provisioning and managing Azure reso
 Scroll down and make sure that the status is enabled for the intended subscription.
 2. From **Windows Explorer** navigate to the course folder and from there launch the command prompt by going to the address bar and typing `cmd` (for the Windows command prompt) or `bash` (for the Linux command prompt assuming it is installed already) and type `az --version` to check the installation. 
 
-3. When you logged in to the CLI in step 1 above you will see a json list of all the Azure account you have access to. Run `az account show` to see you current active account.  Run `az account list -o table` if you want to see all of you Azure account in a table. If you would like to switch to another Azure account run `az account set --subscription <your SubscriptionId>` to set the active subcription.  Run `az group create -n aitutorial -l eastus2` to create a resource group called `aitutorial`. Note if you are deploying the Linux DSVM into the same resource group as the Windows DSVM from Part 1 you don't need to create a resource group (in fact you will get an error that the resource group already exists). Change directory to `cd arm/ldsvm`. Next run the following command to provision the DSVM:
+3. When you logged in to the CLI in step 1 above you will see a json list of all the Azure account you have access to. Run `az account show` to see you current active account.  Run `az account list -o table` if you want to see all of you Azure account in a table. If you would like to switch to another Azure account run `az account set --subscription <your SubscriptionId>` to set the active subcription.  Run `az group create -n aitutorial -l westcentralus` to create a resource group called `aitutorial`. Note if you are deploying the Linux DSVM into the same resource group as the Windows DSVM from Part 1 you don't need to create a resource group (in fact you will get an error that the resource group already exists). Change directory to `cd arm/ldsvm`. Next run the following command to provision the DSVM:
 ```
 az group deployment create -g aitutorial --template-file template-ldsvm.json --parameters @parameters-ldsvm.json
 ```
