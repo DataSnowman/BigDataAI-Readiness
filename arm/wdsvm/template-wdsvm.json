@@ -42,7 +42,7 @@
     },
     "variables": {
         "location": "[resourceGroup().location]",
-        "uniqueNameSuffix": "[toLower(uniqueString(resourceGroup().id, subscription().subscriptionId))]",
+        "uniqueNameSuffix": "[toLower(uniqueString(resourceGroup().id,subscription().subscriptionId))]",
         "imagePublisher": "microsoft-ads",
         "imageOffer": "windows-data-science-vm",
         "OSDiskName": "osdiskforwindowssimple",
