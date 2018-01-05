@@ -301,3 +301,10 @@ Use the Sample CLI command from the output of the previous call to test the web 
 ```azurecli
 $ az ml service run realtime -i mmlsparkservice -d "{\"input_df\": [{\" hours-per-week\": 35.0, \" education\": \"10th\", \" marital-status\": \"Married-civ-spouse\"}]}"
 ```
+## Part 6: Cleaning it all up
+
+### Delete the resource group and all of the resources:
+
+```azurecli
+az group delete -n aitutorial
+```

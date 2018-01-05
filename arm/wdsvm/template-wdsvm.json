@@ -41,27 +41,27 @@
         }
     },
     "variables": {
-        "location": "[resourceGroup().location]",
         "uniqueNameSuffix": "[toLower(uniqueString(resourceGroup().id,subscription().subscriptionId))]",
+        "location": "[resourceGroup().location]",
         "imagePublisher": "microsoft-ads",
-        "imageOffer": "windows-data-science-vm",
+        "WimageOffer": "windows-data-science-vm",
         "OSDiskName": "osdiskforwindowssimple",
         "sku": "windows2016",
-        "nicName": "[concat('vmnic', variables('uniqueNameSuffix'))]",
-        "addressPrefix": "10.0.0.0/16",
+        "WnicName": "[concat('wvmnic', variables('uniqueNameSuffix'))]",
+        "WaddressPrefix": "10.0.0.0/16",
         "subnetName": "Subnet",
-        "subnetPrefix": "10.0.0.0/24",
+        "WsubnetPrefix": "10.0.0.0/24",
         "storageAccountType": "Standard_LRS",
         "storageAccountName": "[concat('storage', variables('uniqueNameSuffix'))]",
         "publicIPAddressType": "Dynamic",
-        "publicIPAddressName": "[concat('pubip', variables('uniqueNameSuffix'))]",
-        "dnsNameForPublicIP": "[concat('dns', variables('uniqueNameSuffix'))]", 
+        "WpublicIPAddressName": "[concat('wpubip', variables('uniqueNameSuffix'))]",
+        "WdnsNameForPublicIP": "[concat('wdns', variables('uniqueNameSuffix'))]", 
         "vmStorageAccountContainerName": "vhds",
-        "vmName": "[parameters('vmName')]",
-        "vmSize": "[parameters('vmSize')]",
-        "virtualNetworkName": "[concat('vnet', variables('uniqueNameSuffix'))]",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+        "WvmName": "[parameters('vmName')]",
+        "WvmSize": "[parameters('vmSize')]",
+        "WvirtualNetworkName": "[concat('wvnet', variables('uniqueNameSuffix'))]",
+        "WvnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('WvirtualNetworkName'))]",
+        "WsubnetRef": "[concat(variables('WvnetID'),'/subnets/',variables('subnetName'))]"
     },
     "resources": [
         {
@@ -76,31 +76,31 @@
         {
             "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIPAddressName')]",
+            "name": "[variables('WpublicIPAddressName')]",
             "location": "[variables('location')]",
             "properties": {
                 "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
                 "dnsSettings": {
-                    "domainNameLabel": "[variables('dnsNameForPublicIP')]"
+                    "domainNameLabel": "[variables('WdnsNameForPublicIP')]"
                 }
             }
         },
         {
             "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('virtualNetworkName')]",
+            "name": "[variables('WvirtualNetworkName')]",
             "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('addressPrefix')]"
+                        "[variables('WaddressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "[variables('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnetPrefix')]"
+                            "addressPrefix": "[variables('WsubnetPrefix')]"
                         }
                     }
                 ]
@@ -109,11 +109,11 @@
         {
             "apiVersion": "2015-05-01-preview",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[variables('nicName')]",
+            "name": "[variables('WnicName')]",
             "location": "[variables('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('WpublicIPAddressName'))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('WvirtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -122,10 +122,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('WpublicIPAddressName'))]"
                             },
                             "subnet": {
-                                "id": "[variables('subnetRef')]"
+                                "id": "[variables('WsubnetRef')]"
                             }
                         }
                     }
@@ -135,7 +135,7 @@
         {
             "apiVersion": "2015-06-15",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[variables('vmName')]",
+            "name": "[variables('WvmName')]",
             "location": "[variables('location')]",
             "plan": {
                 "name": "windows2016",
@@ -147,28 +147,28 @@
             },
             "dependsOn": [
                 "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
+                "[concat('Microsoft.Network/networkInterfaces/', variables('WnicName'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]"
+                    "vmSize": "[variables('WvmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[variables('vmName')]",
+                    "computerName": "[variables('WvmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": {
                         "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
+                        "offer": "[variables('WimageOffer')]",
                         "sku": "[variables('sku')]",
                         "version": "latest"
                     },
                     "osDisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'), variables('vmName'),  '.vhd')]"
+                            "uri": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/',variables('vmStorageAccountContainerName'),'/',variables('OSDiskName'), variables('WvmName'),  '.vhd')]"
                         },
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
@@ -177,7 +177,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('WnicName'))]"
                         }
                     ]
                 },
@@ -191,6 +191,6 @@
         }
     ],
     "outputs": {
-        "DataScienceVmUrl": { "type": "string", "value": "[concat('https://portal.azure.com/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachines/', variables('vmName'))]" }
+        "DataScienceVmUrl": { "type": "string", "value": "[concat('https://portal.azure.com/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachines/', variables('WvmName'))]" }
     }
 }

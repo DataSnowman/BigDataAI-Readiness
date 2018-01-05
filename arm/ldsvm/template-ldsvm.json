@@ -50,7 +50,6 @@
         }
     },
     "variables": {
-        "namePrefix": "[resourceGroup().name]",
         "uniqueNameSuffix": "[toLower(uniqueString(resourceGroup().id,subscription().subscriptionId))]",
         "location": "[resourceGroup().location]",
         "storageVersion": "2015-06-15",
@@ -59,27 +58,25 @@
         "networkInterfacesVersion": "2015-06-15",
         "numberOfInstances": "[parameters('numberOfInstances')]",
         "imagePublisher": "microsoft-ads",
-        "imageOffer": "linux-data-science-vm-ubuntu",
-        "OSDiskName": "osdiskforlinuxsimple",
-        "DataDiskName": "datadiskforlinuxsimple",
+        "LimageOffer": "linux-data-science-vm-ubuntu",
         "sku": "linuxdsvmubuntu",
-        "nicName": "[concat('vmnic', variables('uniqueNameSuffix'))]",
-        "addressPrefix": "10.0.0.0/16",
+        "LnicName": "[concat('lvmnic', variables('uniqueNameSuffix'))]",
+        "LaddressPrefix": "10.0.0.0/16",
         "subnetName": "Subnet",
-        "subnetPrefix": "10.0.0.0/24",
+        "LsubnetPrefix": "10.0.0.0/24",
         "publicIPAddressType": "Dynamic",
-        "publicIPAddressName": "[concat('pubip', variables('uniqueNameSuffix'))]",
-        "vmName": "[parameters('vmName')]",
-        "vmSize": "[parameters('vmSize')]",
-        "virtualNetworkName": "[concat('vnet', variables('uniqueNameSuffix'))]",
-        "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('virtualNetworkName'))]",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnetName'))]"
+        "LpublicIPAddressName": "[concat('lpubip', variables('uniqueNameSuffix'))]",
+        "LvmName": "[parameters('vmName')]",
+        "LvmSize": "[parameters('vmSize')]",
+        "LvirtualNetworkName": "[concat('lvnet', variables('uniqueNameSuffix'))]",
+        "LvnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('LvirtualNetworkName'))]",
+        "LsubnetRef": "[concat(variables('LvnetID'),'/subnets/',variables('subnetName'))]"
     },
     "resources": [
         {
             "apiVersion": "[variables('publicIPAddressesVersion')]",
             "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[concat(variables('publicIPAddressName'), copyindex())]",
+            "name": "[concat(variables('LpublicIPAddressName'), copyindex())]",
             "location": "[variables('location')]",
             "copy": {
                 "name": "publicIPLoop",
@@ -88,26 +85,26 @@
             "properties": {
                 "publicIPAllocationMethod": "[variables('publicIPAddressType')]",
                 "dnsSettings": {
-                    "domainNameLabel": "[concat(variables('publicIPAddressName'), copyindex())]"
+                    "domainNameLabel": "[concat(variables('LpublicIPAddressName'), copyindex())]"
                 }
             }
         },
         {
             "apiVersion": "[variables('virtualNetworksVersion')]",
             "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('virtualNetworkName')]",
+            "name": "[variables('LvirtualNetworkName')]",
             "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('addressPrefix')]"
+                        "[variables('LaddressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "[variables('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnetPrefix')]"
+                            "addressPrefix": "[variables('LsubnetPrefix')]"
                         }
                     }
                 ]
@@ -116,15 +113,15 @@
         {
             "apiVersion": "[variables('networkInterfacesVersion')]",
             "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat(variables('nicName'), copyindex())]",
+            "name": "[concat(variables('LnicName'), copyindex())]",
             "location": "[variables('location')]",
             "copy": {
                 "name": "nicLoop",
                 "count": "[variables('numberOfInstances')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', concat(variables('publicIPAddressName'),copyindex()))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]"
+                "[concat('Microsoft.Network/publicIPAddresses/', concat(variables('LpublicIPAddressName'),copyindex()))]",
+                "[concat('Microsoft.Network/virtualNetworks/', variables('LvirtualNetworkName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
@@ -133,10 +130,10 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('publicIPAddressName'),copyindex()))]"
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',concat(variables('LpublicIPAddressName'),copyindex()))]"
                             },
                             "subnet": {
-                                "id": "[variables('subnetRef')]"
+                                "id": "[variables('LsubnetRef')]"
                             }
                         }
                     }
@@ -146,7 +143,7 @@
         {
             "apiVersion": "2016-04-30-preview",
             "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(variables('vmName'), copyIndex())]",
+            "name": "[concat(variables('LvmName'), copyIndex())]",
             "location": "[variables('location')]",
             "copy": {
                 "name": "virtualMachineLoop",
@@ -155,38 +152,38 @@
             "plan": {                
                 "name": "[variables('sku')]",
                 "publisher": "[variables('imagePublisher')]",
-                "product": "[variables('imageOffer')]"
+                "product": "[variables('LimageOffer')]"
             },
             "tags": {
                 "Application": "DataScience"
             },
             "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
+                "[concat('Microsoft.Network/networkInterfaces/', variables('LnicName'), copyindex())]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('vmSize')]"
+                    "vmSize": "[variables('LvmSize')]"
                 },
                 "osProfile": {
-                    "computerName": "[concat(variables('vmName'), copyIndex())]",
+                    "computerName": "[concat(variables('LvmName'), copyIndex())]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminPassword')]"
                 },
                 "storageProfile": {
                     "imageReference": {
                         "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
+                        "offer": "[variables('LimageOffer')]",
                         "sku": "[variables('sku')]",
                         "version": "latest"
                     },
                     "osDisk": {
-                        "name": "[concat(variables('vmName'), 'osdisk', copyIndex())]",
+                        "name": "[concat(variables('LvmName'), 'osdisk', copyIndex())]",
                         "caching": "ReadWrite",
                         "createOption": "FromImage"
                     },
                     "dataDisks": [
                         {
-                            "name": "[concat(variables('vmName'), 'data', copyIndex())]",
+                            "name": "[concat(variables('LvmName'), 'data', copyIndex())]",
                             "createOption": "FromImage",
                             "lun": 0
                         }
@@ -195,7 +192,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('nicName'), copyindex()))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(variables('LnicName'), copyindex()))]"
                         }
                     ]
                 },
@@ -208,8 +205,8 @@
         }
     ],
     "outputs": {
-        "firstDataScienceVmUrl": { "type": "string", "value": "[concat('https://portal.azure.com/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachines/', variables('vmName'), '0')]" },
-        "dnsName": {"type": "string", "value": "[concat(variables('publicIPAddressName'), '0.', variables('location'), '.cloudapp.azure.com')]"},
-        "sshConnection": { "type": "string", "value": "[concat('ssh ', parameters('adminUsername'), '@', variables('publicIPAddressName'), '0.', variables('location'), '.cloudapp.azure.com')]" }
+        "firstDataScienceVmUrl": { "type": "string", "value": "[concat('https://portal.azure.com/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachines/', variables('LvmName'), '0')]" },
+        "LdnsName": {"type": "string", "value": "[concat(variables('LpublicIPAddressName'), '0.', variables('location'), '.cloudapp.azure.com')]"},
+        "sshConnection": { "type": "string", "value": "[concat('ssh ', parameters('adminUsername'), '@', variables('LpublicIPAddressName'), '0.', variables('location'), '.cloudapp.azure.com')]" }
     }
 }
